@@ -25,7 +25,8 @@ start_data = [
             "Размыкание цепей": "ok",
             "Протечки": "ok",
             "Активный заезд": "ok",
-            "Устройство в сети": "error"
+            "Устройство в сети": "error",
+            "Счетчик": -1
         }
     },
     {
@@ -37,7 +38,8 @@ start_data = [
             "Размыкание цепей": "ok",
             "Протечки": "ok",
             "Активный заезд": "error",
-            "Устройство в сети": "error"
+            "Устройство в сети": "error",
+            "Счетчик": -1
         }
     }
 ]
@@ -52,7 +54,8 @@ start_data1 = [
             "Размыкание цепей": "ok",
             "Протечки": "ok",
             "Активный заезд": "ok",
-            "Устройство в сети": "error"
+            "Устройство в сети": "error",
+            "Счетчик": -1
         }
     },
     {
@@ -64,7 +67,8 @@ start_data1 = [
             "Размыкание цепей": "ok",
             "Протечки": "ok",
             "Активный заезд": "error",
-            "Устройство в сети": "ok"
+            "Устройство в сети": "ok",
+            "Счетчик": 10
         }
     }
 ]
@@ -82,6 +86,9 @@ def echo(ws):
         ws.send(data)
         global g_num
         g_num = g_num + 1
+        data = data.split()#разбиваем по пробелам
+        if len(data) > 1:#если это не "connect", а ['57', '10']
+            start_data1[1]['102']['Счетчик'] = data[0]
         [socketio.emit('sensors', i) for i in start_data1]
 
 
@@ -89,7 +96,7 @@ def background_thread():
     print("Generating random sensor values")
     global g_num
     while True:
-        print([i for i in start_data])
+        #print([i for i in start_data])
         #g_num = not g_num
         g_num = g_num - 1
         if g_num < 0:
@@ -113,7 +120,7 @@ def index():
 
 @socketio.on('connect')
 def test_message(message):
-    print([i for i in start_data])
+    #print([i for i in start_data])
     # [emit('sensors', i) for i in start_data]
     global thread
     print('Client connected')

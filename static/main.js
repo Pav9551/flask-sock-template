@@ -5,6 +5,7 @@ class Table{
     this.header = Object.keys(data)[0];
     this.status = data[this.header]["status"];
     this.body = (({ status, ...o }) => o)(data[this.header]);
+    this.footer = data[this.header]["Счетчик"];
   }
   generate(){
     const header = `<tr><th>${this.header}</tr></th>`;
@@ -12,7 +13,8 @@ class Table{
       tr += `<tr><td class='${this.body[td]}'>${td}</tr></td>`;
       return tr;
     }, "");
-    return header + body;
+    const footer = `<tr><th>${this.footer}</tr></th>`;
+    return header + body + footer;
   }
   create(table){
     table.className = this.status;
