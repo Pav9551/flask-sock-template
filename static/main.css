@@ -1,0 +1,79 @@
+body{
+  background: #414141;
+  display: grid;
+  place-items: center;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: minmax(min-content, max-content);
+  gap: 150px;
+  margin: 40px;
+}
+
+@media only screen and (max-width: 600px){
+  body{
+    grid-template-columns: repeat(1, 1fr);
+  }
+  
+  table{
+    position: relative;
+    width: 100%;
+    display: grid;
+    place-items: center;
+  }
+
+  table::after{
+    content: '';
+    position: absolute;
+    width: 100%;
+    bottom: -50px;
+    height: 1px;
+    background: white;
+    left: 0;
+  }
+}
+
+table tbody{
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+  
+}
+
+table th {
+  display: grid;
+}
+
+table th, table td{
+  color: white;
+  position: relative;
+}
+
+table th::before, table td::before{
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: red;
+  aspect-ratio: 1 / 1;
+  height: 25px;
+  left: -15px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+table th::before{
+  left: 15px;
+}
+
+table td::before {
+  height: 20px;
+}
+
+table.ok th::before, table td.ok::before{
+  background: green;
+}
+
+table.warning th::before, table td.warning::before{
+  background: orange;
+}
+
+
+
