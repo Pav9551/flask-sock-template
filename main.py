@@ -7,11 +7,12 @@ from datetime import datetime
 from flask_sock import Sock
 import json
 
-g_num = True
+g_num = 0
 thread = None
 thread_lock = Lock()
 
 app = Flask(__name__)
+app.config['SOCK_SERVER_OPTIONS'] = {'ping_interval': 25}
 socketio = SocketIO(app)
 
 start_data = [
@@ -23,7 +24,8 @@ start_data = [
             "Загазованность": "ok",
             "Размыкание цепей": "ok",
             "Протечки": "ok",
-            "Активный заезд": "ok"
+            "Активный заезд": "ok",
+            "Устройство в сети": "error"
         }
     },
     {
@@ -34,7 +36,8 @@ start_data = [
             "Загазованность": "warning",
             "Размыкание цепей": "ok",
             "Протечки": "ok",
-            "Активный заезд": "error"
+            "Активный заезд": "error",
+            "Устройство в сети": "error"
         }
     }
 ]
@@ -48,7 +51,8 @@ start_data1 = [
             "Загазованность": "ok",
             "Размыкание цепей": "ok",
             "Протечки": "ok",
-            "Активный заезд": "ok"
+            "Активный заезд": "ok",
+            "Устройство в сети": "error"
         }
     },
     {
@@ -59,11 +63,26 @@ start_data1 = [
             "Загазованность": "warning",
             "Размыкание цепей": "ok",
             "Протечки": "ok",
-            "Активный заезд": "ok"
+            "Активный заезд": "error",
+            "Устройство в сети": "ok"
         }
     }
 ]
+def get_current_datetime():
+    now = datetime.now()
+    return now.strftime("%m/%d/%Y %H:%M:%S")
+sock = Sock(app)
 
+@sock.route('/echo')
+def echo(ws):
+    while True:
+        data = ws.receive()
+        if data == 'close':
+            break
+        ws.send(data)
+        global g_num
+        g_num = g_num + 1
+        [socketio.emit('sensors', i) for i in start_data1]
 
 
 def background_thread():
@@ -71,13 +90,18 @@ def background_thread():
     global g_num
     while True:
         print([i for i in start_data])
-        g_num = not g_num
+        #g_num = not g_num
+        g_num = g_num - 1
+        if g_num < 0:
+            g_num = 0
+        if g_num > 3:
+            g_num = 3
         print(g_num)
-        if g_num:
+        if g_num > 0:
             [socketio.emit('sensors', i) for i in start_data1]
         else:
             [socketio.emit('sensors', i) for i in start_data]
-        socketio.sleep(1.0)
+        socketio.sleep(0.2)
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
